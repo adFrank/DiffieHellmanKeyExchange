@@ -3,10 +3,23 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.function.BinaryOperator;
 
 public class Communicator {
-    BigInteger secret;
+    private BigInteger privateKey;
+    private BigInteger publicKey;
+    private BigInteger p;
+    private BigInteger g;
+
+    public BigInteger getPublicKey() {
+        return publicKey;
+    }
+
+    public Communicator(BigInteger p, BigInteger g) {
+        this.p = p;
+        this.g = g;
+        this.privateKey = randomBigint(p);
+        calculatePublicKey();
+    }
 
     public Future listen(int port) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -17,9 +30,8 @@ public class Communicator {
         new Client().send(port, message);
     }
 
-    public BigInteger calculateGpowSecretModP(BigInteger g, BigInteger p) {
-        secret = randomBigint(p);
-        return g.modPow(secret, p);
+    public void calculatePublicKey() {
+        this.publicKey = g.modPow(privateKey, p);
     }
 
     private BigInteger randomBigint(BigInteger max) {
@@ -31,7 +43,7 @@ public class Communicator {
         return result;
     }
 
-    public BigInteger calculateCommonSecret(BigInteger receivedCommbinedKey, BigInteger p) {
-        return receivedCommbinedKey.modPow(secret, p);
+    public BigInteger calculateCommonKey(BigInteger receivedPublicKey) {
+        return receivedPublicKey.modPow(privateKey, p);
     }
 }
