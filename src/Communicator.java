@@ -6,19 +6,13 @@ import java.util.concurrent.Future;
 
 public class Communicator {
     private BigInteger privateKey;
-    private BigInteger publicKey;
     private BigInteger p;
     private BigInteger g;
-
-    public BigInteger getPublicKey() {
-        return publicKey;
-    }
 
     public Communicator(BigInteger p, BigInteger g) {
         this.p = p;
         this.g = g;
         this.privateKey = randomBigint(p);
-        calculatePublicKey();
     }
 
     public Future listen(int port) {
@@ -30,8 +24,8 @@ public class Communicator {
         new Client().send(port, message);
     }
 
-    public void calculatePublicKey() {
-        this.publicKey = g.modPow(privateKey, p);
+    public BigInteger calculatePublicKey() {
+         return g.modPow(privateKey, p);
     }
 
     private BigInteger randomBigint(BigInteger max) {
